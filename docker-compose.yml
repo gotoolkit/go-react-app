@@ -1,0 +1,30 @@
+version: '2'
+
+services:
+  server:
+    image: golang:alpine
+    container_name: goreact
+    labels:
+      - "traefik.port=8080"
+    volumes:
+      - ./server:/go/src/server
+    working_dir: /go/src/server
+    command: go run main.go
+    depends_on: 
+      - front
+    networks: 
+      - web
+  front:
+    image: node:alpine
+    stdin_open: true
+    # tty: true
+    working_dir: /usr/src/app
+    volumes:
+      - ./web:/usr/src/app
+      - ./server/view:/usr/src/app/build
+    command: yarn build
+
+networks:
+  web:
+    external:
+      name: traefik
