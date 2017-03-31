@@ -1,6 +1,6 @@
-### golang  react app
+## golang  react app
 
-###quick start 
+### Quick Start 
 
 ```
 docker-compose up -d
