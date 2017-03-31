@@ -4,8 +4,8 @@ services:
   server:
     image: golang:alpine
     container_name: goreact
-    ports:
-      - 8080:8080
+    # ports:
+    #   - 8080:8080
     labels:
       - "traefik.port=8080"
     volumes:
@@ -16,6 +16,13 @@ services:
       - build
     networks: 
       - goreact
+  build:
+    image: node:alpine
+    working_dir: /usr/src/app
+    volumes:
+      - ./web:/usr/src/app
+      - ./server/view:/usr/src/app/build
+    command: yarn build
   dev:
     image: node:alpine
     container_name: dev-goreact
@@ -29,12 +36,5 @@ services:
     command: yarn start
     networks: 
       - goreact
-  build:
-    image: node:alpine
-    working_dir: /usr/src/app
-    volumes:
-      - ./web:/usr/src/app
-      - ./server/view:/usr/src/app/build
-    command: yarn build
 networks:
   goreact:
