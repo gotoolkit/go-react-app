@@ -22,7 +22,7 @@ services:
     working_dir: /usr/src/app
     volumes:
       - ./web:/usr/src/app
-      - ./web/build:/usr/src/app/build
+#      - ./web/build:/usr/src/app/build
     command: yarn build
   dev:
     image: node:alpine

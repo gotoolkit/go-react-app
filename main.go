@@ -1,19 +1,35 @@
 package main
 
 import (
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 	"net/http"
-	"log"
-	"html/template"
+	"github.com/jinzhu/gorm"
 )
 
-func main() {
-	fs := http.FileServer(http.Dir("web/static/"))
-	http.Handle("/static/", http.StripPrefix("/static/",fs))
-	http.HandleFunc("/", seveIndex)
-	log.Println("Listening...")
-	http.ListenAndServe(":8080", nil)
+func init() {
+	db, err := gorm.Open("mysql", "user:password@/dbname?charset=utf8&parseTime=True&loc=Local")
+	defer db.Close()
 }
-func seveIndex(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("web/index.html"))
-	tmpl.Execute(w, nil)
+
+func main() {
+	e := echo.New()
+
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{echo.GET, echo.PUT, echo.POST, echo.DELETE},
+	}))
+
+	e.Static("/static", "web/static")
+	e.File("/", "web/index.html")
+
+	// Route => handler
+	e.GET("/status", func(c echo.Context) error {
+		return c.JSON(http.StatusOK, echo.Map{"status": true})
+	})
+
+	e.Logger.Fatal(e.Start(":8080"))
 }
