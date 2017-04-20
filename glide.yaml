@@ -3,4 +3,7 @@ import:
 - package: github.com/labstack/echo
   version: ^3.0.3
 - package: github.com/jinzhu/gorm
-  version: ^1.0.0
+- package: github.com/go-sql-driver/mysql
+- package: github.com/gotoolkit/db
+  subpackages:
+  - config

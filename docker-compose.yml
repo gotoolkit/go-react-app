@@ -13,6 +13,8 @@ services:
       - ./web/build:/go/src/app/web
     working_dir: /go/src/app
     command: go run main.go
+    extra_hosts: 
+      - "dockerhost:192.168.65.2"
     depends_on: 
       - build
     networks: 
@@ -22,7 +24,6 @@ services:
     working_dir: /usr/src/app
     volumes:
       - ./web:/usr/src/app
-#      - ./web/build:/usr/src/app/build
     command: yarn build
   dev:
     image: node:alpine
