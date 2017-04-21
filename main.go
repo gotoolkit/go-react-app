@@ -3,17 +3,16 @@ package main
 import (
 	"net/http"
 
-	"fmt"
-	"github.com/gotoolkit/db/config"
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"log"
+	"github.com/gotoolkit/db/config"
+	"github.com/gotoolkit/db/orm"
+	"github.com/gotoolkit/db/handler"
+	"github.com/gotoolkit/db/model"
+	"github.com/gotoolkit/db"
 )
 
-var db *gorm.DB
-var err error
 // User simple model
 type User struct {
 	ID        int    `json:"id"`
@@ -21,7 +20,9 @@ type User struct {
 	LastName  string `json:"last_name"`
 }
 
-func init() {
+
+func main() {
+
 	dbConfig := &config.DBConfig{
 		Dialect:  "mysql",
 		Username: "root",
@@ -31,28 +32,16 @@ func init() {
 		Name:     "go-react-db",
 		Charset:  "utf8",
 	}
-	dbURI := fmt.Sprintf("%s:%s@(%s:%s)/%s?charset=%s&parseTime=True",
-		dbConfig.Username,
-		dbConfig.Password,
-		dbConfig.Host,
-		dbConfig.Port,
-		dbConfig.Name,
-		dbConfig.Charset,
-	)
-	db, err = gorm.Open(dbConfig.Dialect, dbURI)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
 
-	db.AutoMigrate(&User{})
-}
+	orm.InitialDB(dbConfig)
 
-func main() {
+	orm.GetDB().AutoMigrate(&model.User{}, &model.Task{})
+
 	e := echo.New()
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	//e.Use(db.EchoMiddleware(db))
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
@@ -66,34 +55,8 @@ func main() {
 		return c.JSON(http.StatusOK, echo.Map{"status": true})
 	})
 
-	e.GET("/users", GetList)
-
+	handler.SetRoute(e)
 	e.Logger.Fatal(e.Start(":8080"))
 }
 
-func GetDB() *gorm.DB {
-	return db
-}
 
-func GetList(c echo.Context) error {
-	users := &[]User{}
-	return process(c, GetDB().Find(&users).Error, &users)
-}
-func process(c echo.Context, err error, result interface{}) error {
-	var msg string
-	if err != nil {
-		msg = fmt.Sprint(err)
-	}
-	statusCode := http.StatusOK
-	switch err {
-	case gorm.ErrRecordNotFound:
-		statusCode = http.StatusNotFound
-	case gorm.ErrInvalidSQL, gorm.ErrInvalidTransaction, gorm.ErrCantStartTransaction:
-		statusCode = http.StatusInternalServerError
-	}
-	return c.JSON(statusCode, echo.Map{
-		"resule":  result,
-		"error":   err != nil,
-		"message": msg,
-	})
-}
