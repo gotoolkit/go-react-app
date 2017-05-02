@@ -2,51 +2,53 @@ package handler
 
 import (
 	"fmt"
-	"github.com/jinzhu/gorm"
-	"github.com/labstack/echo"
 	"net/http"
 	"strconv"
-	"github.com/gotoolkit/db/model"
-	"log"
+	"reflect"
+
+	"github.com/jinzhu/gorm"
+	"github.com/labstack/echo"
 )
 
-func SetRoute(e *echo.Echo) {
-
-	setModelRoute(e, "/tasks", &model.Task{})
-	setModelRoute(e, "/users", &model.User{})
-}
-
-func setModelRoute(e *echo.Echo, path string, in model.ReadWriter) {
+func SetModelRoute(e *echo.Echo, path string, in interface{}) {
 
 	e.GET(path, GetAll(in))
-	e.GET(fmt.Sprint(path,"/:id"), GetByID(in))
+	e.GET(fmt.Sprint(path, "/:id"), GetByID(in))
 	e.POST(path, Create(in))
 }
 
-func Create(writer model.ReadWriter) echo.HandlerFunc {
+func Create(writer interface{}) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		user := writer.BindModel()
-		err := c.Bind(user)
+		orm := c.Get("orm").(*gorm.DB)
+		v := reflect.TypeOf(writer).Elem()
+		m := reflect.New(v).Interface()
+		err := c.Bind(m)
 		if err != nil {
 			return err
 		}
-		err = writer.Create(user)
-		return process(c, err, user)
+		return process(c, orm.Save(m).Error, m)
 	}
 }
 
-func GetByID(reader model.Reader) echo.HandlerFunc {
+func GetByID(reader interface{}) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id, _ := strconv.Atoi(c.Param("id"))
-		log.Println(id)
-		result, err := reader.GetByID(id)
-		return process(c, err, result)
+		orm := c.Get("orm").(*gorm.DB)
+
+		v := reflect.TypeOf(reader).Elem()
+		m := reflect.New(v).Interface()
+
+		err := orm.Find(m, id).Error
+		return process(c, err, m)
 	}
 }
-func GetAll(reader model.Reader) echo.HandlerFunc {
+func GetAll(reader interface{}) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		result, err := reader.GetAll()
-		return process(c, err, result)
+		orm := c.Get("orm").(*gorm.DB)
+		v := reflect.TypeOf(reader).Elem()
+		m := reflect.New(reflect.SliceOf(v)).Interface()
+		err := orm.Find(m).Error
+		return process(c, err, m)
 	}
 }
 

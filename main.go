@@ -2,15 +2,17 @@ package main
 
 import (
 	"net/http"
+	"strings"
 
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"github.com/gotoolkit/db/config"
-	"github.com/gotoolkit/db/orm"
 	"github.com/gotoolkit/db/handler"
-	"github.com/gotoolkit/db/model"
 	"github.com/gotoolkit/db"
+	"github.com/gotoolkit/db/model"
+	"github.com/jinzhu/gorm"
+	"github.com/dgrijalva/jwt-go"
+	"time"
 )
 
 // User simple model
@@ -20,33 +22,93 @@ type User struct {
 	LastName  string `json:"last_name"`
 }
 
-
 func main() {
-
-	dbConfig := &config.DBConfig{
+	orm := db.InitDBWithConfig(db.DBConfig{
 		Dialect:  "mysql",
 		Username: "root",
 		Password: "root",
-		Host:     "dockerhost",
+		Host:     "db",
 		Port:     "3306",
 		Name:     "go-react-db",
 		Charset:  "utf8",
-	}
+	})
 
-	orm.InitialDB(dbConfig)
-
-	orm.GetDB().AutoMigrate(&model.User{}, &model.Task{})
+	orm.AutoMigrate(&model.User{})
 
 	e := echo.New()
 
-	e.Use(middleware.Logger())
+	//ordered
+	setupMiddleWare(e, orm)
+	setupUI(e)
+	setupRoute(e)
+
+	e.Logger.Fatal(e.Start(":8080"))
+}
+
+func setupAuth(e *echo.Echo) {
+	e.GET("/token", func(c echo.Context) error {
+
+		token := jwt.New(jwt.SigningMethodHS256)
+
+		claims := token.Claims.(jwt.MapClaims)
+		claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+
+
+		// Generate encoded token and send it as response.
+		t, err := token.SignedString([]byte("secret"))
+		if err != nil {
+			return err
+		}
+		return c.JSON(http.StatusOK, echo.Map{
+			"token": t,
+		})
+	})
+
+	g := e.Group("/admin")
+	g.Use(middleware.JWT([]byte("secret")))
+	g.GET("", func(c echo.Context) error {
+		user := c.Get("user").(*jwt.Token)
+		claims := user.Claims.(jwt.MapClaims)
+		name := claims["name"].(string)
+		return c.String(http.StatusOK, "Welcome "+name+"!")
+	})
+	//g.Use(middleware.BasicAuthWithConfig(middleware.BasicAuthConfig{
+	//	Validator: func(username, password string, c echo.Context) bool {
+	//		if username == "paul" && password == "tian" {
+	//			return true
+	//		}
+	//		return false
+	//	},
+	//}))
+
+
+}
+
+func setupMiddleWare(e *echo.Echo, orm *gorm.DB) {
+
+	// db
+	e.Use(db.EchoMiddleware(orm))
+
+	// log
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Skipper: func(c echo.Context) bool {
+			if strings.HasSuffix(c.Request().Host, "l.wizmacau.com") {
+				return true
+			}
+			return false
+		},
+	}))
+
+	// recover
 	e.Use(middleware.Recover())
-	//e.Use(db.EchoMiddleware(db))
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"*"},
 		AllowMethods: []string{echo.GET, echo.PUT, echo.POST, echo.DELETE},
 	}))
+	setupAuth(e)
+}
+
+func setupUI(e *echo.Echo) {
 
 	e.Static("/static", "web/static")
 	e.File("/", "web/index.html")
@@ -54,9 +116,8 @@ func main() {
 	e.GET("/status", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, echo.Map{"status": true})
 	})
-
-	handler.SetRoute(e)
-	e.Logger.Fatal(e.Start(":8080"))
 }
 
-
+func setupRoute(e *echo.Echo) {
+	handler.SetModelRoute(e, "/users", &model.User{})
+}

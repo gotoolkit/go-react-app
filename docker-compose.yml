@@ -11,11 +11,18 @@ services:
       - ./web/build:/go/src/app/web
     working_dir: /go/src/app
     command: go run main.go
-    extra_hosts: 
-      - "dockerhost:192.168.65.2"
+    links: 
+      - db
     depends_on: 
       - build
     networks: 
+      - goreact
+  db:
+    image: mysql
+    environment: 
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=go-react-db
+    networks:
       - goreact
   build:
     image: node:alpine
