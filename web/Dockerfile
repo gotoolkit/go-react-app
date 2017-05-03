@@ -1,12 +1,11 @@
 FROM node:alpine
 
-RUN apk add --no-cache git curl && curl https://glide.sh/get | sh
+COPY . /usr/src/app
 
-COPY . /go/src/github.com/gotoolkit/goreact
+WORKDIR /usr/src/app
 
-WORKDIR /go/src/github.com/gotoolkit/goreact
+RUN yarn install && yarn build
 
-RUN glide install && go install
+RUN mv build/* /go/src/github.com/gotoolkit/goreact/web
 
-ENTRYPOINT ["goreact"]
-
+VOLUME ["/go/src/github.com/gotoolkit/goreact/web"]
