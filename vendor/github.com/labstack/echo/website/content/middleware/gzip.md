@@ -4,7 +4,6 @@ description = "Gzip middleware for Echo"
 [menu.main]
   name = "Gzip"
   parent = "middleware"
-  weight = 5
 +++
 
 Gzip middleware compresses HTTP response using gzip compression scheme.
@@ -41,7 +40,7 @@ GzipConfig struct {
 
 ```go
 DefaultGzipConfig = GzipConfig{
-  Skipper: defaultSkipper,
+  Skipper: DefaultSkipper,
   Level:   -1,
 }
 ```

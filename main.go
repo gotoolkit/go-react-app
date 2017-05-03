@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/gotoolkit/db/handler"
@@ -23,22 +23,24 @@ type User struct {
 }
 
 func main() {
-	orm := db.InitDBWithConfig(db.DBConfig{
-		Dialect:  "mysql",
-		Username: "root",
-		Password: "root",
-		Host:     "db",
-		Port:     "3306",
-		Name:     "go-react-db",
-		Charset:  "utf8",
-	})
-
-	orm.AutoMigrate(&model.User{})
+	//orm := db.InitDBWithConfig(db.DBConfig{
+	//	Dialect:  "postgres",
+	//	Username: "postgres",
+	//	Password: "D6EaUhzvWKnaMqq",
+	//	Host:     "db",
+	//	Port:     "3306",
+	//	Name:     "go-react-db",
+	//	Charset:  "utf8",
+	//})
+	//
+	//orm.AutoMigrate(&model.User{})
 
 	e := echo.New()
 
+	//e.Use(db.EchoMiddleware(orm))
+
 	//ordered
-	setupMiddleWare(e, orm)
+	setupMiddleWare(e)
 	setupUI(e)
 	setupRoute(e)
 
@@ -84,10 +86,7 @@ func setupAuth(e *echo.Echo) {
 
 }
 
-func setupMiddleWare(e *echo.Echo, orm *gorm.DB) {
-
-	// db
-	e.Use(db.EchoMiddleware(orm))
+func setupMiddleWare(e *echo.Echo) {
 
 	// log
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{

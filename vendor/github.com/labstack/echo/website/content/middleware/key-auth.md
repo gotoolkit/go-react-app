@@ -4,7 +4,6 @@ description = "Key auth middleware for Echo"
 [menu.main]
   name = "Key Auth"
   parent = "middleware"
-  weight = 5
 +++
 
 Key auth middleware provides a key based authentication.
@@ -16,8 +15,8 @@ Key auth middleware provides a key based authentication.
 *Usage*
 
 ```go
-e.Use(middleware.KeyAuth(func(key string) bool {
-  return key == "valid-key"
+e.Use(middleware.KeyAuth(func(key string) (error, bool) {
+  return nil, key == "valid-key"
 }))
 ```
 
@@ -62,7 +61,7 @@ KeyAuthConfig struct {
 
 ```go
 DefaultKeyAuthConfig = KeyAuthConfig{
-  Skipper:    defaultSkipper,
+  Skipper:    DefaultSkipper,
   KeyLookup:  "header:" + echo.HeaderAuthorization,
   AuthScheme: "Bearer",
 }

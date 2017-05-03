@@ -1,22 +1,23 @@
-hash: 7c691f809f13abfb1d94f5f70712b3651cbb6825fe31fd6aedb9bbb0fcdc1abc
-updated: 2017-04-20T11:01:46.654894757+08:00
+hash: 341a5e5a1236477ef701de8dd3fbf90472761737163a1f10fe9760ba565d1569
+updated: 2017-05-03T11:58:28.645423568+08:00
 imports:
 - name: github.com/dgrijalva/jwt-go
   version: 2268707a8f0843315e2004ee4f1d021dc08baedf
 - name: github.com/go-sql-driver/mysql
-  version: 9dee4ca50b83acdf57a35fb9e6fb4be640afa2f3
+  version: ae5a66df4d33ba404d639bd0fc9189cd5ee79bcf
 - name: github.com/gotoolkit/db
-  version: 34df2f840d67827e9d68e4fe683e269619d42c50
+  version: c1579a0d8c91412102699717ea7ed877542024ba
   subpackages:
-  - config
+  - handler
+  - model
 - name: github.com/jinzhu/gorm
-  version: 5174cc5c242a728b435ea2be8a2f7f998e15429b
+  version: 717654b31c3d51348cb305684369c20a8387154b
   subpackages:
   - dialects/mysql
 - name: github.com/jinzhu/inflection
   version: 1c35d901db3da928c72a72d8458480cc9ade058f
 - name: github.com/labstack/echo
-  version: 948d607539e92f3974d8f24951c8975d7342e24a
+  version: 1049c9613cd371b7ea8f219404c9a821734781ed
   subpackages:
   - middleware
 - name: github.com/labstack/gommon
@@ -35,12 +36,12 @@ imports:
 - name: github.com/valyala/fasttemplate
   version: dcecefd839c4193db0d35b88ec65b4c12d360ab0
 - name: golang.org/x/crypto
-  version: 12c985af8526c1f6f0c463bbfd9d69623d13b323
+  version: d1464577745bc7f4e74f65be9cfbd09436a729d6
   subpackages:
   - acme
   - acme/autocert
 - name: golang.org/x/sys
-  version: f3918c30c5c2cb527c0b071a27c35120a6c0719a
+  version: 9ccfe848b9db8435a24c424abbc07a921adf1df5
   subpackages:
   - unix
 testImports: []

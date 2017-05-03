@@ -4,7 +4,6 @@ description = "JWT middleware for Echo"
 [menu.main]
   name = "JWT"
   parent = "middleware"
-  weight = 5
 +++
 
 JWT provides a JSON Web Token (JWT) authentication middleware.
@@ -71,7 +70,7 @@ JWTConfig struct {
 
 ```go
 DefaultJWTConfig = JWTConfig{
-  Skipper:       defaultSkipper,
+  Skipper:       DefaultSkipper,
   SigningMethod: AlgorithmHS256,
   ContextKey:    "user",
   TokenLookup:   "header:" + echo.HeaderAuthorization,

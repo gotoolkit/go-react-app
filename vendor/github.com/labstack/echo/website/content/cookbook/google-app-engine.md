@@ -4,7 +4,6 @@ description = "Google App Engine example for Echo"
 [menu.main]
   name = "Google App Engine"
   parent = "cookbook"
-  weight = 12
 +++
 
 Google App Engine (GAE) provides a range of hosting options from pure PaaS (App Engine Classic)
@@ -60,7 +59,7 @@ at least gained the ability to organize our handlers a little more cleanly.
 ## AppEngine Classic and Managed VMs
 
 So far we've seen how to split apart the Echo creation and setup but still have the same app that
-still only runs standalone. Now we'll see hwo those changes allow us to add support for AppEngine
+still only runs standalone. Now we'll see how those changes allow us to add support for AppEngine
 hosting.
 
 Refer to the [AppEngine site](https://cloud.google.com/appengine/docs/go/) for full configuration

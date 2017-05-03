@@ -4,10 +4,11 @@ description = "Serving static files in Echo"
 [menu.main]
   name = "Static Files"
   parent = "guide"
-  weight = 3
 +++
 
 Images, JavaScript, CSS, PDF, Fonts and so on...
+
+## [Using Static Middleware]({{< ref "middleware/static.md">}})
 
 ## Using `Echo#Static()`
 

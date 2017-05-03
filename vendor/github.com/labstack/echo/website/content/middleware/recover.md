@@ -4,7 +4,6 @@ description = "Recover middleware for Echo"
 [menu.main]
   name = "Recover"
   parent = "middleware"
-  weight = 5
 +++
 
 Recover middleware recovers from panics anywhere in the chain, prints stack trace
@@ -55,7 +54,7 @@ RecoverConfig struct {
 
 ```go
 DefaultRecoverConfig = RecoverConfig{
-  Skipper:           defaultSkipper,
+  Skipper:           DefaultSkipper,
   StackSize:         4 << 10, // 4 KB
   DisableStackAll:   false,
   DisablePrintStack: false,

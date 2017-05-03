@@ -4,7 +4,6 @@ description = "Twitter Like API example for Echo"
 [menu.main]
   name = "Twitter"
   parent = "cookbook"
-  weight = 2 
 +++
 
 This example shows how to create a Twitter like REST API using MongoDB (Database),
@@ -33,6 +32,12 @@ JWT (API security) and JSON (Data exchange).
 `post.go`
 
 {{< embed "twitter/handler/post.go" >}}
+
+## Server
+
+`server.go`
+
+{{< embed "twitter/server.go" >}}
 
 ## API
 

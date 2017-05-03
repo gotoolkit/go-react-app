@@ -231,7 +231,7 @@ func (c *context) Scheme() string {
 func (c *context) RealIP() string {
 	ra := c.request.RemoteAddr
 	if ip := c.request.Header.Get(HeaderXForwardedFor); ip != "" {
-		ra = ip
+		ra = strings.Split(ip, ", ")[0]
 	} else if ip := c.request.Header.Get(HeaderXRealIP); ip != "" {
 		ra = ip
 	} else {
@@ -275,7 +275,7 @@ func (c *context) SetParamNames(names ...string) {
 }
 
 func (c *context) ParamValues() []string {
-	return c.pvalues
+	return c.pvalues[:len(c.pnames)]
 }
 
 func (c *context) SetParamValues(values ...string) {
@@ -471,7 +471,12 @@ func (c *context) Stream(code int, contentType string, r io.Reader) (err error) 
 	return
 }
 
-func (c *context) File(file string) error {
+func (c *context) File(file string) (err error) {
+	file, err = url.QueryUnescape(file) // Issue #839
+	if err != nil {
+		return
+	}
+
 	f, err := os.Open(file)
 	if err != nil {
 		return ErrNotFound
@@ -487,11 +492,11 @@ func (c *context) File(file string) error {
 		}
 		defer f.Close()
 		if fi, err = f.Stat(); err != nil {
-			return err
+			return
 		}
 	}
 	http.ServeContent(c.Response(), c.Request(), fi.Name(), fi.ModTime(), f)
-	return nil
+	return
 }
 
 func (c *context) Attachment(file, name string) (err error) {
@@ -514,7 +519,7 @@ func (c *context) NoContent(code int) error {
 }
 
 func (c *context) Redirect(code int, url string) error {
-	if code < http.StatusMultipleChoices || code > http.StatusTemporaryRedirect {
+	if code < 300 || code > 308 {
 		return ErrInvalidRedirectCode
 	}
 	c.response.Header().Set(HeaderLocation, url)
@@ -548,4 +553,8 @@ func (c *context) Reset(r *http.Request, w http.ResponseWriter) {
 	c.query = nil
 	c.handler = NotFoundHandler
 	c.store = nil
+	c.path = ""
+	c.pnames = nil
+	// NOTE: Don't reset because it has to have length c.echo.maxParam at all times
+	// c.pvalues = nil
 }

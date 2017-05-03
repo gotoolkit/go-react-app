@@ -4,7 +4,6 @@ description = "Basic auth middleware for Echo"
 [menu.main]
   name = "Basic Auth"
   parent = "middleware"
-  weight = 5
 +++
 
 Basic auth middleware provides an HTTP basic authentication.
@@ -15,11 +14,11 @@ Basic auth middleware provides an HTTP basic authentication.
 *Usage*
 
 ```go
-e.Use(middleware.BasicAuth(func(username, password string, c echo.Context) bool {
+e.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (error, bool) {
 	if username == "joe" && password == "secret" {
-		return true
+		return nil, true
 	}
-	return false
+	return nil, false
 }))
 ```
 
@@ -52,6 +51,6 @@ BasicAuthConfig struct {
 
 ```go
 DefaultBasicAuthConfig = BasicAuthConfig{
-	Skipper: defaultSkipper,
+	Skipper: DefaultSkipper,
 }
 ```

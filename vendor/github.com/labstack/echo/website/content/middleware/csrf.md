@@ -4,7 +4,6 @@ description = "CSRF middleware for Echo"
 [menu.main]
   name = "CSRF"
   parent = "middleware"
-  weight = 5
 +++
 
 Cross-site request forgery, also known as one-click attack or session riding and
@@ -95,7 +94,7 @@ CSRFConfig struct {
 
 ```go
 DefaultCSRFConfig = CSRFConfig{
-  Skipper:      defaultSkipper,
+  Skipper:      DefaultSkipper,
   TokenLength:  32,
   TokenLookup:  "header:" + echo.HeaderXCSRFToken,
   ContextKey:   "csrf",

@@ -4,7 +4,6 @@ description = "Method override middleware for Echo"
 [menu.main]
   name = "Method Override"
   parent = "middleware"
-  weight = 5
 +++
 
 Method override middleware checks for the overridden method from the request and
@@ -44,7 +43,7 @@ MethodOverrideConfig struct {
 
 ```go
 DefaultMethodOverrideConfig = MethodOverrideConfig{
-  Skipper: defaultSkipper,
+  Skipper: DefaultSkipper,
   Getter:  MethodFromHeader(echo.HeaderXHTTPMethodOverride),
 }
 ```
