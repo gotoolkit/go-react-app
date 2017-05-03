@@ -6,6 +6,6 @@ WORKDIR /usr/src/app
 
 RUN yarn install && yarn build
 
-RUN mv build/* /go/src/github.com/gotoolkit/goreact/web
+RUN mkdir -p /go/src/github.com/gotoolkit/goreact/web && mv build/* /go/src/github.com/gotoolkit/goreact/web
 
 VOLUME ["/go/src/github.com/gotoolkit/goreact/web"]
