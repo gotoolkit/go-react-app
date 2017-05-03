@@ -4,13 +4,13 @@ import (
 	"net/http"
 	"strings"
 
-	_ "github.com/jinzhu/gorm/dialects/postgres"
+	//_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/gotoolkit/db/handler"
-	"github.com/gotoolkit/db"
+	//"github.com/gotoolkit/db"
 	"github.com/gotoolkit/db/model"
-	"github.com/jinzhu/gorm"
+	//"github.com/jinzhu/gorm"
 	"github.com/dgrijalva/jwt-go"
 	"time"
 )
