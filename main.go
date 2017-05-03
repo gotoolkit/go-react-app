@@ -109,6 +109,7 @@ func setupMiddleWare(e *echo.Echo) {
 
 func setupUI(e *echo.Echo) {
 
+	e.Static("/css", "web/css")
 	e.Static("/static", "web/static")
 	e.File("/", "web/index.html")
 
