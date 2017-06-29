@@ -13,6 +13,8 @@ import (
 	//"github.com/jinzhu/gorm"
 	"github.com/dgrijalva/jwt-go"
 	"time"
+	"path/filepath"
+	"mime"
 )
 
 // User simple model
@@ -109,15 +111,44 @@ func setupMiddleWare(e *echo.Echo) {
 
 func setupUI(e *echo.Echo) {
 
-	e.Static("/css", "web/css")
-	e.Static("/static", "web/static")
-	e.File("/", "web/index.html")
-
 	e.GET("/status", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, echo.Map{"status": true})
+	})
+
+	e.GET("/*", func(c echo.Context) error {
+		path := "web/" + c.Param("*")
+		data, err := Asset(path)
+		if err != nil {
+			c.JSON(400, echo.Map{"status": false, "message": err, "path": c.Param("*")})
+		}
+		return c.Blob(http.StatusOK, assetContentType(path), data)
 	})
 }
 
 func setupRoute(e *echo.Echo) {
 	handler.SetModelRoute(e, "/users", &model.User{})
+}
+
+var extraMimeTypes = map[string]string{
+	".icon": "image-x-icon",
+	".ttf":  "application/x-font-ttf",
+	".woff": "application/x-font-woff",
+	".eot":  "application/vnd.ms-fontobject",
+	".svg":  "image/svg+xml",
+	".html": "text/html; charset-utf-8",
+}
+
+func assetContentType(name string) string {
+	ext := filepath.Ext(name)
+	result := mime.TypeByExtension(ext)
+
+	if result == "" {
+		result = extraMimeTypes[ext]
+	}
+
+	if result == "" {
+		result = "text/plain; charset=utf-8"
+	}
+
+	return result
 }
